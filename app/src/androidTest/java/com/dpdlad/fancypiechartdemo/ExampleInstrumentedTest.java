@@ -1,4 +1,4 @@
-package com.dpdlad.fancypiechart;
+package com.dpdlad.fancypiechartdemo;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

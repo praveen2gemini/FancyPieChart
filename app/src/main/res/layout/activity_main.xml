@@ -5,35 +5,45 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <com.dpdlad.fancypiechart.FancyPieChartView
-            android:id="@+id/symmetricStarViewOriginal"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_margin="@dimen/margin_xxlarge" />
+            android:id="@+id/symmetricStarViewOriginal1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="@dimen/margin_large" />
 
         <com.dpdlad.fancypiechart.FancyPieChartView
             android:id="@+id/symmetricStarViewOriginal2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_xxlarge" />
+            android:layout_below="@+id/symmetricStarViewOriginal1"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="@dimen/margin_large"
+            android:layout_toEndOf="@+id/symmetricStarViewOriginal1" />
 
         <com.dpdlad.fancypiechart.FancyPieChartView
             android:id="@+id/symmetricStarViewOriginal3"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_margin="@dimen/margin_xxlarge" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/symmetricStarViewOriginal2"
+            android:layout_alignParentStart="true"
+            android:layout_margin="@dimen/margin_large" />
 
         <com.dpdlad.fancypiechart.FancyPieChartView
             android:id="@+id/symmetricStarViewOriginal4"
-            android:layout_width="400dp"
-            android:layout_height="400dp"
-            android:layout_margin="@dimen/margin_xxlarge" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/symmetricStarViewOriginal3"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="@dimen/margin_large"
+            android:layout_toEndOf="@+id/symmetricStarViewOriginal3" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </ScrollView>
