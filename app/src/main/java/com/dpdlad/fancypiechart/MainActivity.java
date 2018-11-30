@@ -18,22 +18,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        fancyPieChartViewOriginal.loadPieChartView();
         fancyPieChartViewOriginal
                 .dataBuilder()
                 .setMaximumDataRange(100)
-                .addDataValue("Android", 50, Color.DKGRAY)
-                .addDataValue("iOS", 50, Color.RED)
-//                .addDataValue("Java", 50, Color.GREEN)
-//                .addDataValue("DotNet", 25, Color.BLUE)
-//                .addDataValue("PHP", 50, Color.MAGENTA)
-
-
-//                .addDataValue("Android", 10, Color.DKGRAY)
-//                .addDataValue("iOS", 20, Color.RED)
-//                .addDataValue("Java", 40, Color.GREEN)
-//                .addDataValue("DotNet", 70, Color.BLUE)
-//                .addDataValue("PHP", 80, Color.MAGENTA)
+                .addDataValue("Android", 100, Color.DKGRAY)
+                .addDataValue("iOS", 80, Color.RED)
+                .addDataValue("Java", 50, Color.GREEN)
+                .addDataValue("DotNet", 96, Color.BLUE)
+                .addDataValue("PHP", 30, Color.MAGENTA)
+                .addDataValue("test1", 7, Color.BLACK)
+//                .addDataValue("test2", 27, Color.CYAN)
+//                .addDataValue("test3", 46, Color.LTGRAY)
+//                .addDataValue("test4", 46, Color.YELLOW)
                 .create();
 
     }

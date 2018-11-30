@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.RectF;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
@@ -26,7 +25,7 @@ public class FancyPieChartView extends View {
     //log tag
     private static final String TAG = FancyPieChartView.class.getSimpleName();
     private static final int DEFAULT_MAX_SWEEP_ANGLE = 75;
-    private final Path path = new Path();
+    private static final int DEFAULT_ARC_SPACE = 3; // Default spacious between arc is 3 degree
     private final RectF rect = new RectF();
     // Data for view
     private final ArrayList<ChartInfo> chartDataValues = new ArrayList<>();
@@ -116,8 +115,7 @@ public class FancyPieChartView extends View {
         float half = minSize / 2;
 //        drawCrossOnView(canvas);
 
-
-        drawSplittedArc(half, fat, canvas); // It draws the multiple arcs
+        drawSplitterArc(half, fat, canvas); // It draws the multiple arcs
 
         super.onDraw(canvas);
 
@@ -144,7 +142,7 @@ public class FancyPieChartView extends View {
      * @param fat
      * @param canvas
      */
-    private void drawSplittedArc(float half, float fat, @NonNull Canvas canvas) {
+    private void drawSplitterArc(float half, float fat, @NonNull Canvas canvas) {
         if (null == defaultArcPaint) {
             int mWidth = getWidth();
             int mHeight = getHeight();
@@ -158,24 +156,12 @@ public class FancyPieChartView extends View {
         }
 
         if (!chartDataValues.isEmpty()) {
-//            Log.e("@@@@", "totalDataValue: " + getMaximumDataValue());
-            float startAngle = 360 / chartDataValues.size();
-            float incrementValue = 0;
             for (int dataIndex = 0; dataIndex < chartDataValues.size(); dataIndex++) {
                 ChartInfo chartInfo = chartDataValues.get(dataIndex);
                 defaultArcPaint.setColor(chartInfo.chartColor);
-//                float singleValue = chartInfo.chartValue;
-//                Log.e("@@@@", "singleValue: " + singleValue);
-//                float drawAngle = chartInfo.currentAngle;
-//                Log.e("@@@@", "drawAngle: " + drawAngle);
-                Log.e("@@@@", chartInfo.chartName + " Previous Angle: " + chartInfo.previousAngle);
+                Log.e("@@@@", chartInfo.chartName + " Previous Angle: " + chartInfo.startAngle);
                 Log.e("@@@@", chartInfo.chartName + " CurrentAngle Angle: " + chartInfo.currentAngle);
-                if (dataIndex != 0) {
-                    incrementValue = incrementValue + startAngle;
-//                    canvas.drawArc(rect, chartInfo.previousAngle, chartInfo.currentAngle, false, defaultArcPaint);
-                }
-                Log.e("@@@@", "IncrementValue : " + incrementValue);
-                canvas.drawArc(rect, chartInfo.previousAngle, chartInfo.currentAngle, false, defaultArcPaint);
+                canvas.drawArc(rect, chartInfo.startAngle, chartInfo.endAngle, false, defaultArcPaint);
             }
         }
 
@@ -203,7 +189,7 @@ public class FancyPieChartView extends View {
 
         private String chartName;
         private int chartValue;
-        private float previousAngle, currentAngle;
+        private float startAngle, currentAngle, endAngle;
         private @ColorInt
         int chartColor;
 
@@ -239,28 +225,20 @@ public class FancyPieChartView extends View {
             int size = chartDataValues.size();
             setMaximumDataValue(maximumDataValue * size);
 
-            float logAngle = 0.0f;
-//            float maxValue = (getMaximumDataValue() / size);
+            float totalScore = 0.0f;
             for (ChartInfo chartInfo : chartDataValues) {
-                float singleValue = chartInfo.chartValue;
-//                Log.e("@@@@", "maxValue: " + getMaximumDataValue());
-                float drawAngle = (singleValue / getMaximumDataValue()) * 360;
-                Log.e("@@@@", "drawAngle: " + drawAngle);
-                chartInfo.currentAngle = drawAngle;
-                logAngle = logAngle + drawAngle;
+                totalScore += chartInfo.chartValue;
             }
-//            logAngle = (logAngle / getMaximumDataValue()) * 360;
-            Log.e("@@@@", "getMaximumDataValue: " + getMaximumDataValue());
-            Log.e("@@@@", "logAngle Angle: " + logAngle);
-            float diffAngle = (360 - logAngle) / size;
-            Log.e("@@@@", "diffAngle Angle: " + diffAngle);
             for (int dataIndex = 0; dataIndex < chartDataValues.size(); dataIndex++) {
-                ChartInfo singleChartInfo = chartDataValues.get(dataIndex);
-                singleChartInfo.currentAngle = singleChartInfo.currentAngle + diffAngle;
+                ChartInfo chartInfo = chartDataValues.get(dataIndex);
+                float singleValue = chartInfo.chartValue;
+                chartInfo.currentAngle = (singleValue / totalScore) * 360;
                 if (dataIndex > 0) {
-                    singleChartInfo.previousAngle = chartDataValues.get(dataIndex - 1).currentAngle;
+                    chartInfo.startAngle = chartDataValues.get(dataIndex - 1).startAngle + chartDataValues.get(dataIndex - 1).currentAngle;
                 }
+                chartInfo.endAngle = chartInfo.currentAngle - DEFAULT_ARC_SPACE;
             }
+
             loadPieChartView();
         }
     }
