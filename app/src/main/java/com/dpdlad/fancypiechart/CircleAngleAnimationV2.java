@@ -7,7 +7,7 @@ import android.view.animation.Transformation;
 /**
  * This class used to apply animation on splitted arc drawing as progress bar
  *
- * @author Praveen
+ * @author Praveen Kumar on 30/11/18.
  */
 public class CircleAngleAnimationV2 extends Animation {
 

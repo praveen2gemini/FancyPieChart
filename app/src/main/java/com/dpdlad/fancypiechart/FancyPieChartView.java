@@ -1,6 +1,7 @@
 package com.dpdlad.fancypiechart;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -17,7 +18,9 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
 /**
- * @author Praveen Kumar on 16/10/17.
+ * This view used to render the data in pie chart. each values are depends on maximum value of its target. It should be set without fail.
+ *
+ * @author Praveen Kumar on 30/11/18.
  */
 
 public class FancyPieChartView extends View {
@@ -28,12 +31,11 @@ public class FancyPieChartView extends View {
     private static final int DEFAULT_ARC_SPACE = 3; // Default spacious between arc is 3 degree
     private final RectF rect = new RectF();
     // Data for view
-    private final ArrayList<ChartInfo> chartDataValues = new ArrayList<>();
+    private ArrayList<ChartInfo> chartDataValues;
     @IntRange(from = 0, to = DEFAULT_MAX_SWEEP_ANGLE)
     private int mRedSweepAngle = 0;
     private int maximumDataValue = 0;
     private Paint defaultArcPaint;
-    private DataBuilder dataBuilder;
 
     public FancyPieChartView(Context context) {
         this(context, null);
@@ -45,7 +47,7 @@ public class FancyPieChartView extends View {
 
     public FancyPieChartView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        dataBuilder = new DataBuilder();
+//        Todo: Animation yet to be implemented. Coming soon
 //        if (!isInEditMode()) {
 //            CircleAngleAnimationV2.startArcProgressAnimation(this);
 //        }
@@ -60,7 +62,7 @@ public class FancyPieChartView extends View {
     }
 
     public DataBuilder dataBuilder() {
-        return dataBuilder;
+        return new DataBuilder();
     }
 
     public void loadPieChartView() {
@@ -94,15 +96,56 @@ public class FancyPieChartView extends View {
         int mWidth = getWidth();
         int mHeight = getHeight();
         float min = Math.min(mWidth, mHeight);
-        float fat = min / 10;
-        Paint paint = new Paint();
+        float fat = min / 7;
+        Paint paint = getDefaultPaint(Paint.Style.STROKE);
         paint.setColor(color);
-        paint.setAntiAlias(true);
         paint.setStrokeCap(Paint.Cap.BUTT);
-        paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(fat);
         paint.setFilterBitmap(true);
         return paint;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int minimumSize = Math.min(widthMeasureSpec, heightMeasureSpec);
+        if (minimumSize <= 0) {
+            Resources res = getResources();
+            minimumSize = res.getDimensionPixelSize(R.dimen.default_chart_height_width);
+        }
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+        int width;
+        int height;
+
+        //Measure Width
+        if (widthMode == MeasureSpec.EXACTLY) {
+            //Must be this size
+            width = widthSize;
+        } else if (widthMode == MeasureSpec.AT_MOST) {
+            //Can't be bigger than...
+            width = Math.min(minimumSize, widthSize);
+        } else {
+            //Be whatever you want
+            width = minimumSize;
+        }
+
+        //Measure Height
+        if (heightMode == MeasureSpec.EXACTLY) {
+            //Must be this size
+            height = heightSize;
+        } else if (heightMode == MeasureSpec.AT_MOST) {
+            //Can't be bigger than...
+            height = Math.min(minimumSize, heightSize);
+        } else {
+            //Be whatever you want
+            height = minimumSize;
+        }
+
+        //MUST CALL THIS
+        setMeasuredDimension(width, height);
     }
 
     @Override
@@ -113,7 +156,7 @@ public class FancyPieChartView extends View {
         float minSize = Math.min(getWidth(), getHeight());
         float fat = minSize / 7;
         float half = minSize / 2;
-//        drawCrossOnView(canvas);
+//        drawCrossOnView(canvas); // Just to inspect the view coordinates x,y
 
         drawSplitterArc(half, fat, canvas); // It draws the multiple arcs
 
@@ -152,24 +195,18 @@ public class FancyPieChartView extends View {
                     mWidth / 2 + mRadius,
                     mHeight / 2 + mRadius);
             defaultArcPaint = outerCirclePaint(Color.DKGRAY);
-            Log.e("$$$$$$$$$", "outerCirclePaint is NULL");
+            Log.e(TAG, "outerCirclePaint is NULL");
         }
 
         if (!chartDataValues.isEmpty()) {
             for (int dataIndex = 0; dataIndex < chartDataValues.size(); dataIndex++) {
                 ChartInfo chartInfo = chartDataValues.get(dataIndex);
                 defaultArcPaint.setColor(chartInfo.chartColor);
-                Log.e("@@@@", chartInfo.chartName + " Previous Angle: " + chartInfo.startAngle);
-                Log.e("@@@@", chartInfo.chartName + " CurrentAngle Angle: " + chartInfo.currentAngle);
+                Log.e(TAG, chartInfo.chartName + " Previous Angle: " + chartInfo.startAngle);
+                Log.e(TAG, chartInfo.chartName + " CurrentAngle Angle: " + chartInfo.currentAngle);
                 canvas.drawArc(rect, chartInfo.startAngle, chartInfo.endAngle, false, defaultArcPaint);
             }
         }
-
-
-//        canvas.drawArc(rect, 0, mRedSweepAngle, false, defaultArcPaint);
-//        canvas.drawArc(rect, 90, mRedSweepAngle, false, arcPaintGreen);
-//        canvas.drawArc(rect, 180, mRedSweepAngle, false, arcPaintRed);
-//        canvas.drawArc(rect, 270, mRedSweepAngle, false, arcPaintBlue);
     }
 
     @IntRange(from = 0, to = DEFAULT_MAX_SWEEP_ANGLE)
@@ -205,7 +242,7 @@ public class FancyPieChartView extends View {
     public class DataBuilder {
 
         private DataBuilder() {
-
+            chartDataValues = new ArrayList<>();
         }
 
         public DataBuilder addDataValue(String chartName, int data, @ColorInt int arcColor) {
